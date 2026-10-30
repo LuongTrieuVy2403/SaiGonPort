@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Xác Nhận Vào Cảng | Port Entry Confirmation</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  
+  <style>
+    :root {
+      --bg-body: #0f172a;
+      --bg-overlay: rgba(15, 23, 42, 0.55);
+      --bg-navbar: rgba(255, 255, 255, 0.88);
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-input: #ffffff;
+      --bg-input-readonly: #f1f5f9;
+      --bg-input-editable: #f0f9ff;
+      --bg-btn-sec: #ffffff;
+      --bg-btn-cancel: #f1f5f9;
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --text-sub: #64748b;
+      --border-card: rgba(255, 255, 255, 0.4);
+      --border-input: #cbd5e1;
+      --accent-color: #0088cc;
+      --accent-hover: #0077b3;
+      --shadow-color: rgba(15, 23, 42, 0.18);
+      --swal-bg: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0b1120;
+      --bg-overlay: rgba(0, 0, 0, 0.75);
+      --bg-navbar: rgba(15, 23, 42, 0.9);
+      --bg-card: rgba(15, 23, 42, 0.92);
+      --bg-input: #1e293b;
+      --bg-input-readonly: #0f172a;
+      --bg-input-editable: #0c4a6e;
+      --bg-btn-sec: #0f172a;
+      --bg-btn-cancel: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-sub: #94a3b8;
+      --border-card: rgba(255, 255, 255, 0.1);
+      --border-input: #334155;
+      --accent-color: #00e5ff;
+      --accent-hover: #00b8cc;
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      --swal-bg: #0f172a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { 
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-body) url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      color: var(--text-main);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg-overlay);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .navbar {
+      position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 32px; border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      background: var(--bg-navbar); backdrop-filter: blur(12px); flex-shrink: 0;
+    }
+
+    .brand img { height: 34px; width: auto; object-fit: contain; display: block; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .theme-toggle-btn, .lang-switcher, .crew-portal-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--bg-card); border: 1px solid var(--border-input);
+      padding: 6px 14px; border-radius: 20px; cursor: pointer;
+      color: var(--text-main); font-size: 11px; font-weight: 700;
+      font-family: 'Montserrat', sans-serif; height: 34px;
+      transition: all 0.2s ease;
+    }
+
+    .crew-portal-btn {
+      background: var(--accent-color);
+      color: #ffffff !important;
+      border-color: var(--accent-color);
+    }
+
+    .theme-toggle-btn:hover, .lang-switcher:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-1px);
+    }
+    .crew-portal-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .main-wrapper {
+      position: relative; z-index: 10; flex: 1 0 auto;
+      display: flex; justify-content: center; align-items: center; 
+      padding: 30px 16px;
+    }
+
+    #container {
+      width: 100%; max-width: 460px; position: relative;
+      transform-style: preserve-3d; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-panel {
+      width: 100%; background: var(--bg-card); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-card); padding: 32px 28px; border-radius: 20px;
+      box-shadow: 0 16px 40px var(--shadow-color);
+      color: var(--text-main); backface-visibility: hidden;
+    }
+
+    .front-panel { position: relative; z-index: 2; transform: rotateY(0deg); }
+    .back-panel {
+      position: absolute; top: 0; left: 0; z-index: 1;
+      transform: rotateY(180deg); visibility: hidden; display: none;
+    }
+
+    #container.active .back-panel { display: block; visibility: visible; animation: rot-back 0.6s ease-in-out forwards; }
+    #container.active .front-panel { animation: rot-front 0.6s ease-in-out forwards; }
+    #container.close .front-panel { animation: close-rot-front 0.6s ease-in-out forwards; }
+    #container.close .back-panel { display: block; visibility: visible; animation: close-rot-back 0.6s ease-in-out forwards; }
+
+    @keyframes rot-front { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
+    @keyframes rot-back { from { transform: rotateY(180deg); } to { transform: rotateY(0deg); } }
+    @keyframes close-rot-front { from { transform: rotateY(-180deg); } to { transform: rotateY(0deg); } }
+    @keyframes close-rot-back { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
+
+    .card-subtitle-tag { 
+      text-align: center; font-size: 11px; font-weight: 800; 
+      letter-spacing: 2px; color: var(--accent-color); text-transform: uppercase; margin-bottom: 6px; 
+    }
+    h2 { 
+      text-align: center; color: var(--text-main); margin-bottom: 8px; 
+      font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; 
+      text-transform: uppercase; letter-spacing: 0.5px; 
+    }
+    .description-text { text-align: center; font-size: 13px; color: var(--text-muted); font-weight: 500; line-height: 1.5; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    
+    label { 
+      font-weight: 700 !important; 
+      display: block; 
+      margin-bottom: 6px; 
+      font-size: 11px; 
+      color: var(--text-muted) !important; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+    }
+    
+    input, select { 
+      width: 100%; height: 46px; padding: 0 16px; 
+      background: var(--bg-input) !important; 
+      border: 1.5px solid var(--border-input); 
+      border-radius: 10px; 
+      font-size: 14.5px; 
+      font-weight: 600 !important; 
+      color: var(--text-main) !important; 
+      -webkit-text-fill-color: var(--text-main) !important;
+      outline: none; 
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.18);
+    }
+
+    input::placeholder, 
+    select::placeholder {
+      color: #94a3b8 !important;
+      -webkit-text-fill-color: #94a3b8 !important;
+      font-weight: 400 !important;
+      opacity: 1;
+    }
+
+    [data-theme="dark"] input::placeholder,
+    [data-theme="dark"] select::placeholder {
+      color: #64748b !important;
+      -webkit-text-fill-color: #64748b !important;
+    }
+    
+    input:read-only, input:disabled { 
+      background: var(--bg-input-readonly) !important; 
+      color: #334155 !important; 
+      -webkit-text-fill-color: #334155 !important; 
+      border-color: var(--border-input);
+      opacity: 1 !important;
+      cursor: not-allowed;
+    }
+
+    [data-theme="dark"] input:read-only, [data-theme="dark"] input:disabled {
+      color: #cbd5e1 !important;
+      -webkit-text-fill-color: #cbd5e1 !important;
+    }
+
+    .input-editable { 
+      background: var(--bg-input-editable) !important; 
+      border: 1.5px solid var(--accent-color) !important; 
+      color: #0284c7 !important; 
+      -webkit-text-fill-color: #0284c7 !important;
+      font-weight: 700 !important; 
+    }
+
+    .input-with-btn { display: flex; gap: 8px; }
+    .input-with-btn input { flex: 1; }
+
+    .remember-wrapper { display: flex; justify-content: space-between; align-items: center; margin: 14px 0 20px 0; font-size: 13px; color: var(--text-main); }
+    .remember-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-weight: 600; color: var(--text-main); }
+    .remember-checkbox input { width: 18px; height: 18px; accent-color: var(--accent-color); cursor: pointer; }
+    .btn-clear-remember { background: none; border: none; color: #f43f5e; font-size: 12px; cursor: pointer; text-decoration: none; padding: 0; width: auto; font-weight: 600; opacity: 0.9; }
+    .btn-clear-remember:hover { opacity: 1; text-decoration: underline; }
+
+    .btn-small-search { width: auto !important; height: 46px; padding: 0 16px !important; margin-top: 0 !important; background: var(--bg-input-editable); border: 1.5px solid var(--accent-color); color: var(--accent-color) !important; -webkit-text-fill-color: var(--accent-color) !important; font-size: 11px; font-weight: 700; white-space: nowrap; border-radius: 10px; }
+
+    button { 
+      width: 100%; height: 46px; border: none; padding: 0 16px; 
+      font-size: 13px; font-weight: 700; letter-spacing: 0.5px; 
+      text-transform: uppercase; border-radius: 10px; cursor: pointer; 
+      font-family: 'Montserrat', sans-serif; 
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+    button:active { transform: scale(0.98); }
+    
+    .btn-search { 
+      background: var(--accent-color); color: #ffffff !important; 
+      box-shadow: 0 4px 14px rgba(0, 136, 204, 0.35); 
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-search:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0, 136, 204, 0.45); }
+
+    .btn-action-group { display: flex; gap: 10px; margin-top: 16px; }
+    .btn-in { background: #00a8cc; color: #ffffff !important; flex: 1; }
+    .btn-in:hover { background: #0092b3; }
+    .btn-out { background: #e11d48; color: #ffffff !important; flex: 1; }
+    .btn-out:hover { background: #be123c; }
+
+    .btn-register { 
+      background: transparent; color: var(--accent-color) !important; 
+      border: 1.5px solid var(--accent-color); margin-top: 12px; 
+      height: 42px; font-size: 11px;
+    }
+    .btn-register:hover { background: rgba(0, 136, 204, 0.08); }
+
+    .btn-cancel { background: var(--bg-btn-cancel); color: var(--text-sub) !important; margin-top: 8px; border: 1px solid var(--border-input); }
+    .btn-cancel:hover { background: var(--border-input); }
+
+    button:disabled { 
+      background: #e2e8f0 !important; 
+      color: #64748b !important; 
+      -webkit-text-fill-color: #64748b !important;
+      border: 1px solid #cbd5e1 !important;
+      cursor: not-allowed; 
+      opacity: 1 !important; 
+      box-shadow: none !important; 
+      transform: none !important; 
+    }
+
+    [data-theme="dark"] button:disabled {
+      background: #1e293b !important;
+      color: #64748b !important;
+      -webkit-text-fill-color: #64748b !important;
+      border-color: #334155 !important;
+    }
+
+    #infoSection { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border-input); opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
+    #infoSection.show-smooth { display: block; opacity: 1; transform: translateY(0); }
+    #statusMsg { margin-top: 14px; text-align: center; font-weight: 700; font-size: 13px; }
+
+    /* CSS ANIMATION DÀNH RIÊNG CHO MODAL THUYỀN VIÊN */
+    #crewModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-overlay);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    #crewModal.modal-show {
+      display: flex;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #crewModal .card-panel {
+      transform: translateY(-20px) scale(0.95);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #crewModal.modal-show .card-panel {
+      transform: translateY(0) scale(1);
+    }
+
+    .site-footer { 
+      position: relative; z-index: 10; 
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px; background: var(--bg-navbar); border-top: 1px solid rgba(255, 255, 255, 0.15); 
+      margin-top: auto; flex-shrink: 0; backdrop-filter: blur(12px);
+    }
+    
+    .footer-left { flex: 1; display: flex; align-items: center; justify-content: flex-start; }
+    .footer-brand img { height: 26px; width: auto; object-fit: contain; display: block; }
+
+    .footer-center { flex: 1; text-align: center; white-space: nowrap; }
+    .footer-slogan { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--text-sub); text-transform: uppercase; }
+
+    .footer-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 16px; white-space: nowrap; }
+    .footer-social-link { color: var(--text-sub); font-size: 17px; text-decoration: none; transition: color 0.2s ease; }
+    .footer-social-link:hover { color: var(--accent-color); }
+    .footer-author { color: var(--text-sub); font-size: 11px; font-weight: 700; text-decoration: none; font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px; }
+    .footer-author span { color: var(--accent-color); }
+
+    @media (max-width: 600px) {
+      .navbar { padding: 10px 16px; }
+      .site-footer { flex-direction: column; gap: 12px; padding: 14px 16px; }
+      .footer-left, .footer-center, .footer-right { flex: initial; width: 100%; justify-content: center; }
+      .footer-center { order: 2; }
+      .footer-right { order: 3; }
+      .footer-left { order: 1; }
+    }
+
+    body.swal2-shown { overflow: auto !important; padding-right: 0 !important; }
+    .custom-swal-popup { max-height: 85vh !important; overflow-y: auto !important; border: 1px solid var(--border-card) !important; background: var(--swal-bg) !important; color: var(--text-main) !important; border-radius: 16px !important; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+</head>
+<body data-theme="light">
+
+<script>
+  var LINK_LOGO_CONG_TY = "https://i.postimg.cc/YqthXKnZ/Logo-Xanh-Full.png"; 
+  var LINK_FACEBOOK_CONG_TY = "https://www.facebook.com/profile.php?id=100089051825295"; 
+  var LINK_WEBSITE_CONG_TY = "https://saigonport.vn/"; 
+</script>
+
+<header class="navbar">
+  <script>document.write('<a href="' + LINK_WEBSITE_CONG_TY + '" target="_blank" class="brand"><img src="' + LINK_LOGO_CONG_TY + '" alt="Logo Cảng"></a>');</script>
+  <div class="nav-actions">
+    <button class="crew-portal-btn" onclick="toggleCrewPortal()" id="crewPortalBtn">
+      <i class="fa-solid fa-anchor"></i>
+      <span id="crewPortalText">THUYỀN VIÊN</span>
+    </button>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">
+      <i class="fa-solid fa-moon" id="themeIcon"></i>
+      <span id="themeText">DARK</span>
+    </button>
+    <div class="lang-switcher" onclick="toggleLanguage()" id="langBtn">
+      <span class="fi fi-gb" id="langFlag"></span>
+      <span id="langText">EN</span>
+    </div>
+  </div>
+</header>
+
+<main class="main-wrapper">
+  <div id="container">
+
+    <!-- FRONT PANEL -->
+    <div class="card-panel front-panel" id="frontPanel">
+      <div class="card-subtitle-tag" data-i18n="sub_title">CẢNG SÀI GÒN</div>
+      <h2 data-i18n="main_title">TRA CỨU THÔNG TIN</h2>
+      <p class="description-text" data-i18n="desc_text">Nhập số giấy tờ cá nhân kiểm tra thông tin xác nhận vào cảng.</p>
+      
+      <div id="searchSection">
+        <div class="form-group">
+          <label for="cccd" data-i18n="lbl_id_card">SỐ GIẤY TỜ ĐĂNG KÝ</label>
+          <input type="text" id="cccd" placeholder="Nhập số CCCD (12 số)..." data-i18n-ph="ph_cccd" autocomplete="off" maxlength="12">
+          
+          <div class="remember-wrapper">
+            <label class="remember-checkbox">
+              <input type="checkbox" id="chkRemember" checked>
+              <span data-i18n="lbl_remember_me">Ghi nhớ số giấy tờ trên máy này</span>
+            </label>
+            <button type="button" class="btn-clear-remember" onclick="clearRememberedCCCD()" id="btnClearRemember" style="display: none;" data-i18n="btn_clear_remember">Xóa ghi nhớ</button>
+          </div>
+
+          <button type="button" class="btn-search" onclick="checkCCCD()" data-i18n="btn_check">
+            <span>KIỂM TRA TRẠNG THÁI</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        <button type="button" class="btn-register" onclick="showFormKhaiBao()" data-i18n="btn_register_new">CHƯA KHAI BÁO? KHAI BÁO MỚI / CẬP NHẬT</button>
+      </div>
+
+      <div id="infoSection">
+        <div class="form-group">
+          <label data-i18n="lbl_fullname">Họ và Tên:</label>
+          <input type="text" id="hoTen" readonly>
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_company_edit">Đơn vị (Có thể sửa lại nếu vào cho đơn vị khác):</label>
+          <input type="text" id="donVi" class="input-editable" placeholder="Nhập hoặc chỉnh sửa Đơn vị..." data-i18n-ph="ph_company">
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_position">Chức vụ:</label>
+          <input type="text" id="chucVu" readonly>
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_reason">Lý do vào cảng:</label>
+          <input type="text" id="lyDo" readonly>
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_phone">Số điện thoại:</label>
+          <input type="text" id="soDienThoai" readonly>
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_safety_expiry">Thời hạn thẻ an toàn (Đã khóa):</label>
+          <input type="text" id="thoiHanTheAnToan" readonly style="color: #dc2626 !important; -webkit-text-fill-color: #dc2626 !important; font-weight: 700 !important;">
+        </div>
+        
+        <div class="btn-action-group">
+          <button type="button" class="btn-in" id="btnIn" onclick="submitVaoCong()"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_enter_port">VÀO CỔNG</span></button>
+          <button type="button" class="btn-out" id="btnOut" onclick="submitRaCong()"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="btn_exit_port">RA CỔNG</span></button>
+        </div>
+      </div>
+
+      <div id="statusMsg"></div>
+    </div>
+
+    <!-- BACK PANEL -->
+    <div class="card-panel back-panel" id="backPanel">
+      <h3 style="text-align: center; color: var(--accent-color); margin-bottom: 14px; font-size: 14px; font-family: 'Montserrat', sans-serif; font-weight: 800;" data-i18n="form_new_title">KHAI BÁO / CẬP NHẬT THÔNG TIN</h3>
+      
+      <div class="form-group" style="background: var(--bg-input-editable); padding: 12px; border: 1px dashed var(--accent-color); border-radius: 10px; margin-bottom: 16px;">
+        <label style="color: var(--accent-color) !important; font-size: 10px;" data-i18n="lbl_search_old_id">TÌM THÔNG TIN CŨ ĐÃ KHAI BÁO (NẾU CÓ):</label>
+        <div class="input-with-btn">
+          <input type="text" id="kbSearchCCCD" placeholder="Nhập số CCCD (12 số)..." data-i18n-ph="ph_search_old_id" maxlength="12">
+          <button type="button" class="btn-small-search" onclick="loadOldDataForForm()" data-i18n="btn_fetch_data"><i class="fa-solid fa-magnifying-glass"></i> LẤY DỮ LIỆU</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="lbl_kb_id">Số CCCD (12 số) (*):</label>
+        <input type="text" id="kbCCCD" placeholder="Nhập đúng 12 số CCCD" data-i18n-ph="ph_kb_id" maxlength="12">
+      </div>
+      <div class="form-group">
+        <label data-i18n="lbl_kb_fullname">Họ và Tên (*):</label>
+        <input type="text" id="kbHoTen" placeholder="Nhập đầy đủ Họ tên" data-i18n-ph="ph_kb_fullname">
+      </div>
+      <div class="form-group">
+        <label data-i18n="lbl_kb_company">Đơn vị / Công ty (*):</label>
+        <input type="text" id="kbDonVi" placeholder="Tên đơn vị công tác" data-i18n-ph="ph_kb_company">
+      </div>
+      <div class="form-group">
+        <label data-i18n="lbl_kb_position">Chức vụ (*):</label>
+        <input type="text" id="kbChucVu" placeholder="Ví dụ: Lái xe, Công nhân..." data-i18n-ph="ph_kb_position">
+      </div>
+      <div class="form-group">
+        <label data-i18n="lbl_kb_reason">Lý do vào cảng (*):</label>
+        <select id="kbLyDo" onchange="toggleThoiHanRequire()">
+          <option value="" data-i18n="opt_select_reason">-- Chọn lý do vào cảng --</option>
+          <option value="VENDOR">VENDOR</option>
+          <option value="Giám định / Giám sát" data-i18n="opt_inspection">Giám định / Giám sát</option>
+          <option value="Liên hệ công tác" data-i18n="opt_business">Liên hệ công tác</option>
+          <option value="Cung cấp dịch vụ" data-i18n="opt_service">Cung cấp dịch vụ</option>
+          <option value="Lý do khác" data-i18n="opt_other">Lý do khác</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label data-i18n="lbl_kb_phone">Số điện thoại (10 số) (*):</label>
+        <input type="text" id="kbSoDienThoai" placeholder="Nhập đúng 10 số điện thoại" data-i18n-ph="ph_kb_phone" inputmode="tel" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label id="lblThoiHanThe" data-i18n="lbl_kb_expiry">Thời hạn thẻ an toàn:</label>
+        <input type="date" id="kbThoiHanThe" disabled>
+      </div>
+
+      <button type="button" class="btn-search" id="btnLuuKhaiBao" onclick="submitKhaiBaoMoi()" data-i18n="btn_submit_declaration">
+        <span>GỬI KHAI BÁO</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      <button type="button" class="btn-cancel" onclick="hideFormKhaiBao()" data-i18n="btn_cancel">HỦY BỎ / QUAY LẠI</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL CÓ EFFEC/ANIMATION THUYỀN VIÊN -->
+<div id="crewModal">
+  <div class="card-panel" style="max-width:460px; width:100%; margin:auto; position:relative;">
+    <div class="card-subtitle-tag" data-i18n="crew_sub_title">CẢNG SÀI GÒN - THUYỀN VIÊN</div>
+    <h2 id="crewModalTitle" data-i18n="crew_main_title">XÁC NHẬN RA/VÀO THUYỀN VIÊN</h2>
+    <p class="description-text" data-i18n="crew_desc_text">Nhập đầy đủ thông tin thuyền viên và bấm chọn Vào hoặc Ra cổng.</p>
+
+    <div class="form-group">
+      <label data-i18n="crew_lbl_id">SỐ CCCD / VISA / PASSPORT (*):</label>
+      <input type="text" id="crewIdNum" placeholder="Nhập số giấy tờ thuyền viên..." data-i18n-ph="crew_ph_id" autocomplete="off" onblur="autoFetchCrewData()">
+    </div>
+
+    <div id="crewFormFields">
+      <div class="form-group">
+        <label data-i18n="crew_lbl_fullname">HỌ VÀ TÊN (*):</label>
+        <input type="text" id="crewHoTen" placeholder="Họ và tên thuyền viên" data-i18n-ph="crew_ph_fullname">
+      </div>
+      <div class="form-group">
+        <label data-i18n="crew_lbl_ship">TÊN TÀU (*):</label>
+        <input type="text" id="crewTenTau" placeholder="Tên tàu công tác" data-i18n-ph="crew_ph_ship">
+      </div>
+      <div class="form-group">
+        <label data-i18n="crew_lbl_nationality">QUỐC TỊCH (*):</label>
+        <input type="text" id="crewQuocTich" placeholder="Quốc tịch" data-i18n-ph="crew_ph_nationality">
+      </div>
+    </div>
+
+    <div class="btn-action-group" id="crewActionGroup" style="margin-top:16px;">
+      <button type="button" class="btn-in" id="btnCrewIn" onclick="submitCrewVaoCang()"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_enter_port">VÀO CỔNG</span></button>
+      <button type="button" class="btn-out" id="btnCrewOut" onclick="submitCrewRaCang()"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="btn_exit_port">RA CỔNG</span></button>
+    </div>
+
+    <div id="crewStatusMsg" style="margin-top:10px; text-align:center; font-weight:700; font-size:13px;"></div>
+
+    <button type="button" class="btn-cancel" style="margin-top:16px;" onclick="toggleCrewPortal()" data-i18n="crew_btn_close">ĐÓNG / QUAY LẠI</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-left">
+    <div class="footer-brand">
+      <script>document.write('<img src="' + LINK_LOGO_CONG_TY + '" alt="Logo Cảng">');</script>
+    </div>
+  </div>
+  <div class="footer-center">
+    <span class="footer-slogan" data-i18n="slogan">AN TOÀN - CHUYÊN NGHIỆP - HIỆU QUẢ</span>
+  </div>
+  <div class="footer-right">
+    <script>
+      document.write('<a href="' + LINK_FACEBOOK_CONG_TY + '" target="_blank" class="footer-social-link" title="Facebook"><i class="fa-brands fa-facebook"></i></a>');
+      document.write('<a href="' + LINK_WEBSITE_CONG_TY + '" target="_blank" class="footer-social-link" title="Website"><i class="fa-solid fa-globe"></i></a>');
+    </script>
+    <a href="https://guns.lol/imkayyyy" target="_blank" class="footer-author">CODE BY <span>KAY</span></a>
+  </div>
+</footer>
+
+<script>
+  var currentWorker = null;
+  var currentCrew = null;
+  var currentLang = 'vi';
+  var lastLoadedExpiryDate = ""; 
+
+  var i18nData = {
+    vi: {
+      sub_title: "CẢNG SÀI GÒN", main_title: "TRA CỨU THÔNG TIN", desc_text: "Nhập số giấy tờ cá nhân kiểm tra thông tin xác nhận vào cảng.",
+      lbl_id_card: "SỐ GIẤY TỜ ĐĂNG KÝ", ph_cccd: "Nhập số CCCD (12 số)...", btn_check: '<span>KIỂM TRA TRẠNG THÁI</span> <i class="fa-solid fa-arrow-right"></i>',
+      lbl_remember_me: "Ghi nhớ số giấy tờ trên máy này", btn_clear_remember: "Xóa ghi nhớ",
+      btn_register_new: "CHƯA KHAI BÁO? KHAI BÁO MỚI / CẬP NHẬT", lbl_fullname: "Họ và Tên:",
+      lbl_company_edit: "Đơn vị (Có thể sửa lại nếu vào cho đơn vị khác):", ph_company: "Nhập hoặc chỉnh sửa Đơn vị...",
+      lbl_position: "Chức vụ:", lbl_reason: "Lý do vào cảng:", lbl_phone: "Số điện thoại:",
+      lbl_safety_expiry: "Thời hạn thẻ an toàn (Đã khóa):", form_new_title: "KHAI BÁO / CẬP NHẬT THÔNG TIN",
+      lbl_search_old_id: "TÌM THÔNG TIN CŨ ĐỂ TỰ ĐỘNG ĐIỀN (NẾU CÓ):", ph_search_old_id: "Nhập số CCCD (12 số)...",
+      btn_fetch_data: "LẤY DỮ LIỆU", lbl_kb_fullname: "Họ và Tên (*):", ph_kb_fullname: "Nhập đầy đủ Họ tên",
+      lbl_kb_company: "Đơn vị / Công ty (*):", ph_kb_company: "Tên đơn vị công tác", lbl_kb_position: "Chức vụ (*):",
+      ph_kb_position: "Ví dụ: Lái xe, Công nhân...", lbl_kb_reason: "Lý do vào cảng (*):", ph_kb_id: "Nhập đúng 12 số CCCD",
+      lbl_kb_phone: "Số điện thoại (10 số) (*):", ph_kb_phone: "Nhập đúng 10 số điện thoại", lbl_kb_expiry: "Thời hạn thẻ an toàn:",
+      btn_submit_declaration: '<span>GỬI KHAI BÁO</span> <i class="fa-solid fa-arrow-right"></i>', btn_cancel: "HỦY BỎ / QUAY LẠI", slogan: "AN TOÀN - CHUYÊN NGHIỆP - HIỆU QUẢ",
+      confirm_btn: "Đồng ý",
+      crew_button_text: "THUYỀN VIÊN",
+      crew_sub_title: "CẢNG SÀI GÒN - THUYỀN VIÊN",
+      crew_main_title: "XÁC NHẬN RA/VÀO THUYỀN VIÊN",
+      crew_desc_text: "Nhập đầy đủ thông tin thuyền viên và bấm chọn Vào hoặc Ra cổng.",
+      crew_lbl_id: "SỐ CCCD / VISA / PASSPORT (*):",
+      crew_ph_id: "Nhập số giấy tờ thuyền viên...",
+      crew_lbl_fullname: "HỌ VÀ TÊN (*):",
+      crew_ph_fullname: "Họ và tên thuyền viên",
+      crew_lbl_ship: "TÊN TÀU (*):",
+      crew_ph_ship: "Tên tàu công tác",
+      crew_lbl_nationality: "QUỐC TỊCH (*):",
+      crew_ph_nationality: "Quốc tịch",
+      crew_btn_close: "ĐÓNG / QUAY LẠI",
+      btn_enter_port: "VÀO CỔNG",
+      btn_exit_port: "RA CỔNG",
+      opt_select_reason: "-- Chọn lý do vào cảng --",
+      opt_inspection: "Giám định / Giám sát",
+      opt_business: "Liên hệ công tác",
+      opt_service: "Cung cấp dịch vụ",
+      opt_other: "Lý do khác",
+      msg_crew_in_port: "Trạng thái: Đang ở trong cảng (Chưa bấm Ra Cổng).",
+      msg_crew_ready: "Trạng thái: Sẵn sàng vào cổng.",
+      msg_missing_crew_info: "Vui lòng nhập đầy đủ thông tin Thuyền viên!"
+    },
+    en: {
+      sub_title: "SAI GON PORT", main_title: "INFORMATION LOOKUP", desc_text: "Enter your ID number to check port entry confirmation details.",
+      lbl_id_card: "REGISTERED ID NUMBER", ph_cccd: "Enter 12-digit ID...", btn_check: '<span>CHECK STATUS</span> <i class="fa-solid fa-arrow-right"></i>',
+      lbl_remember_me: "Remember ID on this device", btn_clear_remember: "Forget ID",
+      btn_register_new: "NOT YET REGISTER? REGISTER / UPDATE", lbl_fullname: "Full Name:",
+      lbl_company_edit: "Company / Unit (Editable):", ph_company: "Enter or edit Company...",
+      lbl_position: "Position:", lbl_reason: "Purpose of Entry:", lbl_phone: "Phone Number:",
+      lbl_safety_expiry: "Safety Card Expiry (Locked):", form_new_title: "DECLARATION / UPDATE INFORMATION",
+      lbl_search_old_id: "FIND OLD INFORMATION TO AUTO-FILL:", ph_search_old_id: "Enter 12-digit ID...",
+      btn_fetch_data: "FETCH DATA", lbl_kb_fullname: "Full Name (*):", ph_kb_fullname: "Enter full name",
+      lbl_kb_company: "Company (*):", ph_kb_company: "Name of working organization", lbl_kb_position: "Position (*):",
+      ph_kb_position: "E.g., Driver, Worker...", lbl_kb_reason: "Purpose of Entry (*):", ph_kb_id: "Enter 12-digit ID",
+      lbl_kb_phone: "Phone Number (10 digits) (*):", ph_kb_phone: "Enter 10-digit phone number", lbl_kb_expiry: "Safety Card Expiry:",
+      btn_submit_declaration: '<span>SUBMIT DECLARATION</span> <i class="fa-solid fa-arrow-right"></i>', btn_cancel: "CANCEL / BACK", slogan: "SAFE - PROFESSIONAL - EFFECTIVE",
+      confirm_btn: "OK",
+      crew_button_text: "CREW MEMBER",
+      crew_sub_title: "SAI GON PORT - CREW MEMBER",
+      crew_main_title: "CREW ENTRY & EXIT CONFIRMATION",
+      crew_desc_text: "Enter complete crew details and click Enter or Exit port.",
+      crew_lbl_id: "ID / VISA / PASSPORT NUMBER (*):",
+      crew_ph_id: "Enter crew document number...",
+      crew_lbl_fullname: "FULL NAME (*):",
+      crew_ph_fullname: "Crew member full name",
+      crew_lbl_ship: "VESSEL NAME (*):",
+      crew_ph_ship: "Working vessel name",
+      crew_lbl_nationality: "NATIONALITY (*):",
+      crew_ph_nationality: "Nationality",
+      crew_btn_close: "CLOSE / BACK",
+      btn_enter_port: "ENTER PORT",
+      btn_exit_port: "EXIT PORT",
+      opt_select_reason: "-- Select purpose of entry --",
+      opt_inspection: "Inspection / Supervision",
+      opt_business: "Business Contact",
+      opt_service: "Service Provision",
+      opt_other: "Other Reason",
+      msg_crew_in_port: "Status: Currently inside the port (Not checked out).",
+      msg_crew_ready: "Status: Ready for port entry.",
+      msg_missing_crew_info: "Please fill in all Crew Member information!"
+    }
+  };
+
+  function updateContainerHeight(isBackPanel) {
+    var container = document.getElementById('container');
+    var front = document.getElementById('frontPanel');
+    var back = document.getElementById('backPanel');
+    container.style.height = isBackPanel ? back.offsetHeight + 'px' : front.offsetHeight + 'px';
+  }
+
+  window.addEventListener('load', function() { 
+    updateContainerHeight(false);
+    
+    var savedCCCD = localStorage.getItem('PORT_SAVED_CCCD');
+    if (savedCCCD) {
+      document.getElementById('cccd').value = savedCCCD;
+      document.getElementById('chkRemember').checked = true;
+      document.getElementById('btnClearRemember').style.display = 'inline-block';
+      checkCCCD();
+    }
+  });
+
+  function clearRememberedCCCD() {
+    localStorage.removeItem('PORT_SAVED_CCCD');
+    document.getElementById('cccd').value = '';
+    document.getElementById('btnClearRemember').style.display = 'none';
+    document.getElementById('chkRemember').checked = false;
+    resetForm();
+    showAlert('info', 'Thông báo', 'Đã xóa thông tin lưu trên thiết bị này!');
+  }
+
+  function toggleTheme() {
+    var body = document.body;
+    var currentTheme = body.getAttribute('data-theme');
+    var icon = document.getElementById('themeIcon');
+    var text = document.getElementById('themeText');
+    if (currentTheme === 'light') {
+      body.setAttribute('data-theme', 'dark');
+      icon.className = 'fa-solid fa-sun';
+      text.innerText = 'LIGHT';
+    } else {
+      body.setAttribute('data-theme', 'light');
+      icon.className = 'fa-solid fa-moon';
+      text.innerText = 'DARK';
+    }
+  }
+
+  function toggleLanguage() {
+    currentLang = (currentLang === 'vi') ? 'en' : 'vi';
+    document.getElementById('langFlag').className = (currentLang === 'en') ? 'fi fi-vn' : 'fi fi-gb';
+    document.getElementById('langText').innerText = (currentLang === 'en') ? 'VI' : 'EN';
+    applyLanguage();
+  }
+
+  function applyLanguage() {
+    var langMap = i18nData[currentLang];
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (langMap[key]) el.innerHTML = langMap[key];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-ph');
+      if (langMap[key]) el.setAttribute('placeholder', langMap[key]);
+    });
+    var crewTextEl = document.getElementById('crewPortalText');
+    if (crewTextEl && langMap['crew_button_text']) {
+      crewTextEl.innerText = langMap['crew_button_text'];
+    }
+  }
+
+  function toggleThoiHanRequire() {
+    var lyDo = document.getElementById('kbLyDo').value;
+    var lbl = document.getElementById('lblThoiHanThe');
+    var inputThoiHan = document.getElementById('kbThoiHanThe');
+
+    if (lyDo === "VENDOR") {
+      lbl.innerHTML = 'Thời hạn thẻ an toàn (*): <span style="color: #f43f5e; font-size: 10px;">(Bắt buộc với VENDOR)</span>';
+
+      if (lastLoadedExpiryDate) {
+        inputThoiHan.value = lastLoadedExpiryDate;
+
+        var parts = lastLoadedExpiryDate.split('-');
+        var dtHetHan = new Date(parts[0], parts[1] - 1, parts[2], 23, 59, 59);
+        var homNay = new Date();
+
+        if (homNay <= dtHetHan) {
+          inputThoiHan.disabled = true;
+          inputThoiHan.readOnly = true;
+        } else {
+          inputThoiHan.disabled = false;
+          inputThoiHan.readOnly = false;
+        }
+      } else {
+        inputThoiHan.disabled = false;
+        inputThoiHan.readOnly = false;
+      }
+    } else {
+      lbl.innerText = 'Thời hạn thẻ an toàn: (Chỉ dành cho VENDOR)';
+      inputThoiHan.value = "";
+      inputThoiHan.disabled = true;
+      inputThoiHan.readOnly = true;
+    }
+  }
+
+  function showAlert(icon, title, text) {
+    var langMap = i18nData[currentLang];
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: icon, title: title, text: text,
+        confirmButtonColor: '#0088cc',
+        confirmButtonText: langMap.confirm_btn || 'Đồng ý',
+        heightAuto: false, allowOutsideClick: true,
+        customClass: { popup: 'custom-swal-popup' }
+      });
+    } else {
+      alert(text);
+    }
+  }
+
+  function showFormKhaiBao() {
+    var container = document.getElementById('container');
+    var backPanel = document.getElementById('backPanel');
+    backPanel.style.display = 'block';
+    backPanel.style.visibility = 'visible';
+    container.className = 'active';
+    updateContainerHeight(true);
+    document.getElementById('statusMsg').innerText = "";
+    var mainCCCD = document.getElementById('cccd').value.trim();
+    if (mainCCCD) {
+      document.getElementById('kbSearchCCCD').value = mainCCCD;
+      document.getElementById('kbCCCD').value = mainCCCD;
+    }
+  }
+
+  function hideFormKhaiBao() {
+    var container = document.getElementById('container');
+    var backPanel = document.getElementById('backPanel');
+    container.className = 'close';
+
+    lastLoadedExpiryDate = "";
+    var inputThoiHan = document.getElementById('kbThoiHanThe');
+    if (inputThoiHan) {
+      inputThoiHan.disabled = true;
+      inputThoiHan.value = "";
+    }
+
+    setTimeout(function() {
+      if (container.classList.contains('close')) {
+        backPanel.style.visibility = 'hidden';
+        backPanel.style.display = 'none';
+        container.className = ''; 
+        updateContainerHeight(false);
+      }
+    }, 600);
+  }
+
+  function checkCCCD() {
+    var cccd = document.getElementById('cccd').value.trim();
+    if (!cccd) {
+      showAlert('warning', 'Thông báo', 'Vui lòng nhập số CCCD!');
+      return;
+    }
+    if (!/^\d{12}$/.test(cccd)) {
+      showAlert('warning', 'Thông báo lỗi', 'Số CCCD phải có đúng 12 chữ số!');
+      return;
+    }
+
+    var isRemember = document.getElementById('chkRemember').checked;
+    if (isRemember) {
+      localStorage.setItem('PORT_SAVED_CCCD', cccd);
+      document.getElementById('btnClearRemember').style.display = 'inline-block';
+    } else {
+      localStorage.removeItem('PORT_SAVED_CCCD');
+      document.getElementById('btnClearRemember').style.display = 'none';
+    }
+
+    document.getElementById('statusMsg').style.color = "var(--accent-color)";
+    document.getElementById('statusMsg').innerText = "Đang kiểm tra thông tin...";
+    document.getElementById('infoSection').classList.remove('show-smooth');
+
+    google.script.run
+      .withSuccessHandler(showResult)
+      .withFailureHandler(function(err) {
+        document.getElementById('statusMsg').innerText = "";
+        showAlert('error', 'Lỗi hệ thống', err.message || 'Không thể kết nối máy chủ!');
+      })
+      .traCuuCCCD(cccd, false);
+  }
+
+  function showResult(res) {
+    var statusMsg = document.getElementById('statusMsg');
+    if (!res) {
+      showAlert('error', 'Lỗi', 'Không nhận được dữ liệu phản hồi!');
+      statusMsg.innerText = "";
+      return;
+    }
+
+    if (res.error) {
+      showAlert('warning', 'Thông báo', res.error);
+      statusMsg.style.color = "#dc2626";
+      statusMsg.innerText = res.error;
+      document.getElementById('kbCCCD').value = document.getElementById('cccd').value.trim();
+      return;
+    }
+
+    if (res.found) {
+      currentWorker = res;
+      var infoSection = document.getElementById('infoSection');
+      infoSection.style.display = "block";
+      setTimeout(function() {
+        infoSection.classList.add("show-smooth");
+        updateContainerHeight(false);
+      }, 20);
+
+      document.getElementById('hoTen').value = res.hoTen || '';
+      document.getElementById('donVi').value = res.donVi || '';
+      document.getElementById('chucVu').value = res.chucVu || '';
+      document.getElementById('lyDo').value = res.lyDo || '';
+      document.getElementById('soDienThoai').value = res.soDienThoai || '';
+      document.getElementById('thoiHanTheAnToan').value = res.thoiHanTheAnToan || '';
+
+      var btnIn = document.getElementById('btnIn');
+      var btnOut = document.getElementById('btnOut');
+
+      if (res.dangTrongCang) {
+        btnIn.disabled = true;
+        btnOut.disabled = false;
+        statusMsg.style.color = "#d97706";
+        statusMsg.innerText = "Trạng thái: ĐANG Ở TRONG CẢNG (Chưa bấm Ra Cổng).";
+      } else {
+        btnIn.disabled = false;
+        btnOut.disabled = true;
+        statusMsg.style.color = "#059669";
+        statusMsg.innerText = "Trạng thái: SẴN SÀNG VÀO CỔNG.";
+      }
+
+      if (res.canhBaoSapHetHan && res.lyDo === "VENDOR") {
+        showAlert('warning', 'CẢNH BÁO THỜI HẠN THẺ', 'Thẻ an toàn của bạn sắp hết hạn (còn ' + res.soNgayConLai + ' ngày - Hạn đến: ' + res.thoiHanTheAnToan + ').');
+      }
+    } else {
+      statusMsg.style.color = "#dc2626";
+      statusMsg.innerText = "Chưa có dữ liệu! Vui lòng bấm Đăng Ký Mới.";
+      document.getElementById('kbCCCD').value = document.getElementById('cccd').value.trim();
+    }
+  }
+
+  function submitVaoCong() {
+    if (!currentWorker) return;
+    currentWorker.donVi = document.getElementById('donVi').value.trim();
+
+    if (!currentWorker.donVi) {
+      showAlert('warning', 'Thông báo', 'Vui lòng điền Đơn vị!');
+      return;
+    }
+
+    document.getElementById('btnIn').disabled = true;
+    document.getElementById('statusMsg').innerText = "Đang ghi nhận lượt VÀO...";
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res.indexOf("LỖI") !== -1 || res.indexOf("Lỗi") !== -1) {
+          showAlert('error', 'Không thể Vào cổng', res);
+          document.getElementById('btnIn').disabled = false;
+        } else {
+          showAlert('success', 'Thành công', res);
+          resetForm(true);
+        }
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('btnIn').disabled = false;
+        showAlert('error', 'Lỗi hệ thống', err.message);
+      })
+      .ghiNhatKyVaoCong(currentWorker);
+  }
+
+  function submitRaCong() {
+    if (!currentWorker) return;
+
+    document.getElementById('btnOut').disabled = true;
+    document.getElementById('statusMsg').innerText = "Đang ghi nhận lượt RA...";
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res.indexOf("LỖI") !== -1 || res.indexOf("Lỗi") !== -1) {
+          showAlert('error', 'Không thể Ra cổng', res);
+          document.getElementById('btnOut').disabled = false;
+        } else {
+          showAlert('success', 'Thành công', res);
+          resetForm(true);
+        }
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('btnOut').disabled = false;
+        showAlert('error', 'Lỗi hệ thống', err.message);
+      })
+      .ghiNhatKyRaCong(currentWorker);
+  }
+
+  function loadOldDataForForm() {
+    var searchCCCD = document.getElementById('kbSearchCCCD').value.trim();
+    if (!searchCCCD) {
+      showAlert('warning', 'Thông báo', 'Vui lòng nhập số CCCD!');
+      return;
+    }
+    if (!/^\d{12}$/.test(searchCCCD)) {
+      showAlert('warning', 'Thông báo lỗi', 'Số CCCD phải có đúng 12 chữ số!');
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res && res.found) {
+          document.getElementById('kbCCCD').value = res.cccd || searchCCCD;
+          document.getElementById('kbHoTen').value = res.hoTen || '';
+          document.getElementById('kbDonVi').value = res.donVi || '';
+          document.getElementById('kbChucVu').value = res.chucVu || '';
+          document.getElementById('kbLyDo').value = res.lyDo || '';
+          document.getElementById('kbSoDienThoai').value = res.soDienThoai || '';
+          
+          lastLoadedExpiryDate = res.thoiHanInputDate || "";
+          toggleThoiHanRequire();
+
+          showAlert('success', 'Thành công', 'Đã tải thông tin thành công!');
+        } else {
+          showAlert('warning', 'Thông báo', res.error || 'Không tìm thấy thông tin cũ!');
+        }
+      })
+      .traCuuCCCD(searchCCCD, true);
+  }
+
+  function submitKhaiBaoMoi() {
+    var data = {
+      hoTen: document.getElementById('kbHoTen').value.trim(),
+      donVi: document.getElementById('kbDonVi').value.trim(),
+      chucVu: document.getElementById('kbChucVu').value.trim(),
+      lyDo: document.getElementById('kbLyDo').value,
+      cccd: document.getElementById('kbCCCD').value.trim(),
+      soDienThoai: document.getElementById('kbSoDienThoai').value.trim(),
+      thoiHanThe: document.getElementById('kbThoiHanThe').value
+    };
+
+    if (!data.hoTen || !data.donVi || !data.chucVu || !data.lyDo || !data.cccd || !data.soDienThoai) {
+      showAlert('warning', 'Thiếu thông tin', 'Vui lòng điền đầy đủ các thông tin bắt buộc (*)!');
+      return;
+    }
+
+    if (!/^\d{12}$/.test(data.cccd)) {
+      showAlert('warning', 'Thông báo lỗi', 'Số CCCD bắt buộc phải có đúng 12 chữ số!');
+      return;
+    }
+
+    if (!/^\d{10}$/.test(data.soDienThoai)) {
+      showAlert('warning', 'Thông báo lỗi', 'Số điện thoại bắt buộc phải có đúng 10 chữ số!');
+      return;
+    }
+
+    if (data.lyDo === "VENDOR" && !data.thoiHanThe) {
+      showAlert('warning', 'Thiếu thông tin', 'Đối với lý do VENDOR, bắt buộc phải chọn "Thời hạn thẻ an toàn"!');
+      return;
+    }
+
+    document.getElementById('btnLuuKhaiBao').disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        document.getElementById('btnLuuKhaiBao').disabled = false;
+        if (res.success) {
+          showAlert('success', 'Thành công', 'Đã lưu thông tin khai báo thành công!');
+          hideFormKhaiBao();
+          document.getElementById('cccd').value = data.cccd;
+          checkCCCD();
+        } else {
+          showAlert('error', 'Lỗi', res.error);
+        }
+      })
+      .luuKhaiBaoMoi(data);
+  }
+
+  function resetForm(keepSaved) {
+    if (!keepSaved) {
+      document.getElementById('cccd').value = "";
+    }
+    document.getElementById('kbSearchCCCD').value = "";
+    document.getElementById('infoSection').style.display = "none";
+    document.getElementById('statusMsg').innerText = "";
+    document.getElementById('btnIn').disabled = false;
+    document.getElementById('btnOut').disabled = false;
+    currentWorker = null;
+    updateContainerHeight(false);
+  }
+
+  // --- CÁC HÀM XỬ LÝ VÀ ANIMATION CHO THUYỀN VIÊN ---
+  function toggleCrewPortal() {
+    var modal = document.getElementById('crewModal');
+    if (modal.classList.contains('modal-show')) {
+      // Đóng modal với animation
+      modal.classList.remove('modal-show');
+      setTimeout(function() {
+        modal.style.display = 'none';
+      }, 300);
+    } else {
+      // Mở modal với animation
+      modal.style.display = 'flex';
+      setTimeout(function() {
+        modal.classList.add('modal-show');
+      }, 10);
+
+      document.getElementById('crewIdNum').value = '';
+      document.getElementById('crewHoTen').value = '';
+      document.getElementById('crewTenTau').value = '';
+      document.getElementById('crewQuocTich').value = '';
+      document.getElementById('crewStatusMsg').innerText = '';
+      document.getElementById('btnCrewIn').disabled = false;
+      document.getElementById('btnCrewOut').disabled = false;
+      currentCrew = null;
+      applyLanguage();
+    }
+  }
+
+  function autoFetchCrewData() {
+    var idNum = document.getElementById('crewIdNum').value.trim();
+    if (!idNum) return;
+
+    var langMap = i18nData[currentLang];
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        var statusEl = document.getElementById('crewStatusMsg');
+        if (res && res.found) {
+          currentCrew = res;
+          document.getElementById('crewHoTen').value = res.hoTen || '';
+          document.getElementById('crewTenTau').value = res.tenTau || '';
+          document.getElementById('crewQuocTich').value = res.quocTich || '';
+
+          if (res.dangTrongCang) {
+            statusEl.style.color = "#d97706";
+            statusEl.innerText = langMap.msg_crew_in_port;
+            document.getElementById('btnCrewIn').disabled = true;
+            document.getElementById('btnCrewOut').disabled = false;
+          } else {
+            statusEl.style.color = "#059669";
+            statusEl.innerText = langMap.msg_crew_ready;
+            document.getElementById('btnCrewIn').disabled = false;
+            document.getElementById('btnCrewOut').disabled = true;
+          }
+        } else {
+          statusEl.innerText = "";
+          document.getElementById('btnCrewIn').disabled = false;
+          document.getElementById('btnCrewOut').disabled = false;
+        }
+      })
+      .traCuuThuyenVien(idNum);
+  }
+
+  function submitCrewVaoCang() {
+    var langMap = i18nData[currentLang];
+    var idNum = document.getElementById('crewIdNum').value.trim();
+    var hoTen = document.getElementById('crewHoTen').value.trim();
+    var tenTau = document.getElementById('crewTenTau').value.trim();
+    var quocTich = document.getElementById('crewQuocTich').value.trim();
+
+    if (!idNum || !hoTen || !tenTau || !quocTich) {
+      showAlert('warning', 'Thiếu thông tin', langMap.msg_missing_crew_info);
+      return;
+    }
+
+    var crewData = { cccd: idNum, hoTen: hoTen, tenTau: tenTau, quocTich: quocTich };
+    document.getElementById('btnCrewIn').disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res.indexOf("LỖI") !== -1 || res.indexOf("Lỗi") !== -1) {
+          showAlert('error', 'Thông báo', res);
+          document.getElementById('btnCrewIn').disabled = false;
+        } else {
+          showAlert('success', 'Thành công', res);
+          toggleCrewPortal();
+        }
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('btnCrewIn').disabled = false;
+        showAlert('error', 'Lỗi hệ thống', err.message);
+      })
+      .ghiNhatKyThuyenVienVaoCong(crewData);
+  }
+
+  function submitCrewRaCang() {
+    var langMap = i18nData[currentLang];
+    var idNum = document.getElementById('crewIdNum').value.trim();
+    var hoTen = document.getElementById('crewHoTen').value.trim();
+    var tenTau = document.getElementById('crewTenTau').value.trim();
+    var quocTich = document.getElementById('crewQuocTich').value.trim();
+
+    if (!idNum) {
+      showAlert('warning', 'Thiếu thông tin', 'Vui lòng nhập số giấy tờ Thuyền viên!');
+      return;
+    }
+
+    var crewData = { cccd: idNum, hoTen: hoTen, tenTau: tenTau, quocTich: quocTich };
+    document.getElementById('btnCrewOut').disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res.indexOf("LỖI") !== -1 || res.indexOf("Lỗi") !== -1) {
+          showAlert('error', 'Thông báo', res);
+          document.getElementById('btnCrewOut').disabled = false;
+        } else {
+          showAlert('success', 'Thành công', res);
+          toggleCrewPortal();
+        }
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('btnCrewOut').disabled = false;
+        showAlert('error', 'Lỗi hệ thống', err.message);
+      })
+      .ghiNhatKyThuyenVienRaCong(crewData);
+  }
+</script>
+
+</body>
+</html>
